@@ -8,40 +8,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class EmployeeService {
-    List<Employee> employees = new ArrayList<>(10);
 
-    public Employee addEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
-        if (!employees.contains(employee)) {
-            employees.add(employee);
-            if (employees.size()>10){
-                throw new EmployeeStorageIsFullException("Storage is full");
-            }
-        } else {
-            throw new EmployeeAlreadyAddedException("Employee is already contains");
-        }
-        return employee;
+    private final List<Employee> employees = new ArrayList<>(10);
+    private final Map <String, Employee> employeeMap = new HashMap<>(10);
+
+    public void addEmployee(Employee employee) {
+        employeeMap.put(employee.getMiddleName(), employee);
     }
 
-    public Employee deliteEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
-        if (employees.contains(employee)) {
-            employees.remove(employee);
-        } else {
-            throw new EmployeeNotFoundException("Employee not found");
-        }
-        return(employee);
+    public Employee deleteEmployee(String firstName, String lastName, String middleName) {
+        Employee empl = searchEmployee(firstName, lastName, middleName);
+        employeeMap.remove(empl);
+        return empl;
     }
 
 
-    public Employee searchEmployee(String firstName, String lastName) {
-        Employee employee = new Employee(firstName, lastName);
+    public Employee searchEmployee(String firstName, String lastName, String middleName) {
+        Employee employee = new Employee(firstName, lastName, middleName);
         if (employees.contains(employee)) {
             return employee;
         } else {
